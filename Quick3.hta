@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>  
+<head>  
+<title>Quick Connect Retroarch NetPlay v1.00b</title>  
+ 
+<HTA:APPLICATION  
+    ID="objHTA_Info"  
+    APPLICATIONNAME="Quick Connect Retroarch Netplay"  
+    SINGLEINSTANCE="yes"
+    SCROLL="no"
+	BORDER="Thin"
+	BorderStyle="Raised"
+	Icon="#"
+	MaximizeButton="No"
+	 
+>
+<script language="javascript">
+window.resizeTo (810, 634);
+window.moveTo((screen.width - 814) / 2, (screen.height - 642) / 2);
+</script>
+<SCRIPT LANGUAGE="VBScript">
+Dim cwd 
+cwd = CreateObject("Scripting.FileSystemObject").GetAbsolutePathName(".")
+Dim cwd2 
+cwd2= cwd & "\"
+strFileName = cwd2 & "retroarch.cfg"
+' MsgBox cwd2
+   Sub NoContextMenu()
+      window.event.CancelBubble= True
+      window.event.ReturnValue= False
+      ' Alert("Right-click is not allowed, sorry!")
+    End Sub
+    Sub Window_onLoad
+        ' use the following line to disable right-click menu and prevent View Source
+         Set document.onContextMenu=GetRef("NoContextMenu") 
+		' html = "<TABLE><TR><TD><b>Directory of retroarch.exe </b></TD></TR><TR><TD>" & cwd2 & "</TD></TR></TABLE>"
+        ' BLAH.InnerHTML = html  
+	End Sub
+	Sub TestSub
+        For Each objOption in OptionChooser.Options
+            If objOption.Selected Then
+                html2 = "<TABLE><TR><TD><b>Test </b></TD></TR><TR><TD>" & cwd2 & OptionChooser.value & "</TD></TR></TABLE>"
+				gamechoice.InnerHTML = html2
+            End If
+        Next
+    End Sub	
+	Sub RunHosting
+		dim shell
+        Set objShell = CreateObject("Wscript.Shell")
+        ' MsgBox Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " --log-file host2.txt -H -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		objShell.Run Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " --log-file host2.txt -H -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		Set objShell = Nothing
+    End Sub
+	Sub RunClient
+		dim shell
+		dim IP
+		IP=document.getElementById("IP-Input").value
+        Set objShell = CreateObject("Wscript.Shell")
+		' MsgBox Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " -v --log-file client2.txt -C " & IP & " -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		objShell.Run Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " --log-file client2.txt -C " & IP & " -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		Set objShell = Nothing
+    End Sub
+	Sub OpenCfg
+		dim oShell
+		Set oShell = CreateObject("WScript.Shell")
+		' MsgBox Chr(34) & cwd2 & "metapad.exe" & Chr(34) & " retroarch.cfg"
+		oShell.Run Chr(34) & cwd2 & "metapad.exe" & Chr(34) & " retroarch.cfg"
+		Set oShell = Nothing
+	End Sub
+	Sub Offline
+		dim offShell
+		Set offShell = CreateObject("WScript.Shell")
+		' MsgBox Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " --log-file offline.txt -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		offShell.Run Chr(34) & cwd2 & "retroarch.exe" & Chr(34) & " --log-file offline.txt -L " & Chr(34) & cwd2 & "cores\fbalpha_libretro.dll" & Chr(34) & " " & Chr(34) & cwd2 & "roms\" & OptionChooser.value & Chr(34)
+		Set offShell = Nothing
+	End Sub
+' MsgBox cwd2 & " vbs ok"
+</script>
+<SCRIPT LANGUAGE="VBScript">
+Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
+If fileSystemObject.FileExists("retroarch.exe") Then
+		Set fileSystemObject = Nothing
+	Else Alert  "WARNING!" & vbCrLf & Chr(34) & "retroarch.exe" & Chr(34) & vbCrLf & "was NOT found in the current directory: " & vbCrLf & cwd2
+End If
+</script>
+<SCRIPT LANGUAGE="VBScript">
+Option Explicit
+Dim objFSO, objFolder, objShell, strDirectory, coreDirectory, coreFile
+strDirectory = cwd2 & "roms"
+coreDirectory = cwd2 & "cores\"
+coreFile = "fbalpha_libretro.dll"
+
+' Create the File System Object
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+' Note If..Exists. Then, Else ... End If construction
+If objFSO.FolderExists(strDirectory) Then
+   Set objFolder = objFSO.GetFolder(strDirectory)
+   ' Alert  "WARNING! " & strDirectory & " already created "
+Else
+   Set objFolder = objFSO.CreateFolder(strDirectory)
+   Alert "A new folder named 'roms' has been created at " & vbCrLf & strDirectory & vbCrLf & vbCrLf & "Please check the 'readme IMPORTANT.txt' for details."
+End If
+
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+If objFSO.FolderExists(coreDirectory) Then
+    If objFSO.FileExists(coreDirectory & coreFile) Then
+        ' Alert "Folder and file exist" & coreDirectory & coreFile
+		Set objFSO = nothing
+    Else
+        Alert "WARNING! " & vbCrLf & vbCrLf & "Essential core file missing:" & vbCrLf & coreFile & vbCrLf & vbCrLf & "Expected core file should be in:" & vbCrLf & coreDirectory & vbCrLf & vbCrLf & "Solution: You must open 'retroarch.exe' and download the core named 'Arcade (FB Alpha)'" & vbCrLf & vbCrLf & "Please check the 'readme IMPORTANT.txt' for details."
+    End If
+Else
+		Alert "WARNING!" & vbCrLf & "The 'cores' folder does not exist! " & vbCrLf & vbCrLf & "Incomplete RetroArch installation." & vbCrLf & vbCrLf & "Please check the 'readme IMPORTANT.txt' for details."
+End If
+</script>
+<style>
+body {
+    font: normal 18px Verdana, Arial, sans-serif; font-weight:bold
+}
+input {
+    height: 14px;
+	font-size: 17px; 
+	font-weight: normal;
+}
+.button-host {
+  background: url(images/retroarch-st-dialog-box-test1-slice1b_19.png);
+  background-repeat: no-repeat;
+  height: 41px;
+  width: 171px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+}
+.button-host:visited {
+ border: none;
+}
+.button-host:hover {
+ border: solid 2px #ff3300; 
+}
+.button-host:active  {
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+ }
+
+
+a:hover {
+    background-color: yellow;
+}
+
+.button-client {
+  background: url(images/retroarch-st-dialog-box-test1-slice1b_21.png);
+  background-repeat: no-repeat;
+  height: 41px;
+  width: 201px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+}
+.button-client:visited {
+ border: none;
+}
+.button-client:hover {
+ border: solid 2px #ff3300; 
+}
+.button-client:active  {
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+ }
+ 
+.button-cfg {
+  background: url(images/retroarch-st-dialog-box-test1-slice1b_25.png);
+  background-repeat: no-repeat;
+  height: 28px;
+  width: 151px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+}
+.button-cfg:visited {
+ border: none;
+}
+.button-cfg:hover {
+ border: solid 2px #ff3300; 
+}
+.button-cfg:active  {
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+ }
+
+ .button-off {
+  background: url(images/retroarch-st-dialog-box-test1-slice1b_27.png);
+  background-repeat: no-repeat;
+  height: 28px;
+  width: 121px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+}
+.button-off:visited {
+ border: none;
+}
+.button-off:hover {
+ border: solid 2px #ff3300; 
+}
+.button-off:active  {
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+ }
+
+.button-copy  { 
+  height: 22px;
+  width:  64px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+  font-size: 14px;
+  }
+ .button-copy:visited {
+ border: none;
+}
+.button-copy:active  {
+  box-shadow: 0 3px #666;
+  border: solid 2px #0000ff;
+  transform: translateY(4px);
+ } 
+ 
+</style>
+<SCRIPT LANGUAGE="JavaScript">
+
+function ClipBoard() 
+{
+holdtext.innerText = ipaddress.innerText;
+Copied = holdtext.createTextRange();
+Copied.execCommand("Copy");
+}
+</script>
+<script type="text/javascript">
+    window.onload = function () {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "https://api.ipify.org?format=jsonp&callback=DisplayIP";
+        document.getElementsByTagName("head")[0].appendChild(script);
+    };
+    function DisplayIP(response) {
+        document.getElementById("ipaddress").innerHTML = "<font color='white'>" + response.ip + "</font>";
+    }
+</script>
+<script type="text/javascript">
+function changeImage() {
+  var gameValue = document.getElementById("select-games").value;
+  document.getElementById("select-game-picture").src = "images/" + gameValue + ".gif";
+}
+</SCRIPT>
+<script type="text/javascript">
+function ValidateIPaddress(inputText)
+ {
+ var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+ if(inputText.value.match(ipformat))
+ {
+ document.form1.text1.focus();
+ RunClient();
+ return true;
+ }
+ else
+ {
+ alert("IP Error!\n" +inputText.value  +"\nThis is not a valid IP address.");
+ document.form1.text1.focus();return false;
+ }
+ }
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+ 
+ 
+<table id="Table_01" font color="blue" width="801" height="601" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td colspan="8" rowspan="2">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_01.png" width="420" height="90" alt=""></td>
+		<td rowspan="6">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_02.png" width="24" height="138" alt=""></td>
+		<td colspan="4">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_03.png" width="229" height="21" alt=""></td>
+		<td colspan="3" rowspan="7">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_04.png" width="127" height="335" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="21" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="4" rowspan="5">
+			<img class="game-picture" id="select-game-picture" src="images/ssf2xjr1.zip.gif" width="229" height="117" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="69" alt=""></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_06.png" width="84" height="1" alt=""></td>
+		<td colspan="7" rowspan="3" style="background-image: url(images/retroarch-st-dialog-box-test1-slice1b_7.png);">
+		<select id="select-games" name="OptionChooser" onchange="changeImage()" style="width: 336px;">
+ <option value="ssf2xjr1.zip">Super Street Fighter 2 Turbo ssf2xjr1</option>
+ <option value="sf2hf.zip">Street Fighter 2 Turbo sf2hf</option>
+ <option value="sfiii3nr1.zip">Street Fighter 3 Third Strike sfiii3nr1</option>
+  </select></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_08.png" width="84" height="24" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="24" alt=""></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_09.png" width="84" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="8" rowspan="2">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_10.png" width="420" height="219" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="22" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="5">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_11.png" width="253" height="197" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="197" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_12.png" width="142" height="22" alt=""></td>
+		<td align="center" colspan="3" style="background-image: url(images/retroarch-st-dialog-box-test1-slice1b_13.png);">
+		<TEXTAREA ID="holdtext" STYLE="display:none;"></TEXTAREA><span id = "ipaddress"></span></td>
+		<td colspan="6" style="background-image: url(images/retroarch-st-dialog-box-test1-slice1b_14.png);">&nbsp;
+		<BUTTON class="button-copy" onClick="ClipBoard()">Copy IP</BUTTON></td>
+		<td colspan="3" style="background-image: url(images/retroarch-st-dialog-box-test1-slice1b_15.png);">
+		<form name="form1" style="margin-bottom: 0" action="#"><input type='text' size=22 id="IP-Input" name='text1'/><input type="hidden" id="IP" name="IP" value="3487"></td>
+		<td>
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_16.png" width="41" height="22" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="22" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="16">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_17.png" width="800" height="49" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="49" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="2" rowspan="5">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_18.png" width="108" height="194" alt=""></td>
+		<td colspan="3"><button class="button-host" onclick="vbscript:RunHosting"></button></td>
+		<td colspan="5">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_20.png" width="220" height="41" alt=""></td>
+		<td colspan="4">
+		<button class="button-client" onclick="ValidateIPaddress(document.form1.text1)"></button></form></td>
+		<td colspan="2" rowspan="4">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_22.png" width="100" height="167" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="41" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="12">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_23.png" width="592" height="87" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="87" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="2" rowspan="3">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_24.png" width="120" height="66" alt=""></td>
+		<td colspan="3"><button class="button-cfg" onclick="vbscript:OpenCfg"></button</td>
+		<td>
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_26.png" width="41" height="28" alt=""></td>
+		<td colspan="3"><button class="button-off" onclick="vbscript:Offline"></button</td>
+		<td colspan="3" rowspan="3">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_28.png" width="159" height="66" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="28" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="7" rowspan="2">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_29.png" width="313" height="38" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="11" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="images/retroarch-st-dialog-box-test1-slice1b_30.png" width="100" height="27" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="1" height="27" alt=""></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="images/spacer.gif" width="84" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="24" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="34" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="86" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="51" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="55" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="45" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="41" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="24" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="55" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="26" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="106" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="59" height="1" alt=""></td>
+		<td>
+			<img src="images/spacer.gif" width="41" height="1" alt=""></td>
+		<td></td>
+	</tr>
+</table>
+<SCRIPT LANGUAGE="VBScript">
+' MsgBox cwd2 & " html end ok"
+</script>
+<!-- <SPAN ID=BLAH></SPAN> -->
+</body>  
+</html>
